@@ -24,8 +24,8 @@ def setupDataset(dataset):
     return X_train, X_test, y_train, y_test
 
 
-def applyKernel(kernelType, X_train, X_test, y_train):
-    classifier = SVC(kernel=kernelType)
+def applyKernel(kernelType, X_train, X_test, y_train, coef0=0.0):
+    classifier = SVC(kernel=kernelType, coef0=coef0)
     classifier.fit(X_train, y_train)
     predY = classifier.predict(X_test)
     return predY
@@ -34,10 +34,9 @@ def applyKernel(kernelType, X_train, X_test, y_train):
 dataset = pd.read_csv("../data/banana.csv")
 X_train, X_test, y_train, y_test = setupDataset(dataset)
 
-predSigmoidY = applyKernel('sigmoid', X_train, X_test, y_train)
+predSigmoidY1 = applyKernel('sigmoid', X_train, X_test, y_train, 1)
+predSigmoidY05 = applyKernel('sigmoid', X_train, X_test, y_train, 0.5)
+predSigmoidY001 = applyKernel('sigmoid', X_train, X_test, y_train, 0.01)
 predLinearY = applyKernel('linear', X_train, X_test, y_train)
 predPolyY = applyKernel('poly', X_train, X_test, y_train)
 predRBFY = applyKernel('rbf', X_train, X_test, y_train)
-
-print(confusion_matrix(y_test, predLinearY))
-print(classification_report(y_test, predLinearY))
