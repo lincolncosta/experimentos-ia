@@ -6,8 +6,6 @@ from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-dataset = pd.read_csv("../data/banana.csv")
-
 
 def generateScatter(dataset):
     color_dict = dict({1.0: 'red',
@@ -17,7 +15,8 @@ def generateScatter(dataset):
     scatter.set(xlabel='Atributo 1', ylabel='Atributo 2')
     return plt.show()
 
-def setupDataset():
+
+def setupDataset(dataset):
     X = dataset.drop('classe', axis=1)
     y = dataset['classe']
 
@@ -25,30 +24,20 @@ def setupDataset():
     return X_train, X_test, y_train, y_test
 
 
-sigmoidClassifier = SVC(kernel='sigmoid')
-sigmoidClassifier.fit(X_train, y_train)
-predSigmoidY = sigmoidClassifier.predict(X_test)
+def applyKernel(kernelType, X_train, X_test, y_train):
+    classifier = SVC(kernel=kernelType)
+    classifier.fit(X_train, y_train)
+    predY = classifier.predict(X_test)
+    return predY
 
-print(confusion_matrix(y_test, predSigmoidY))
-print(classification_report(y_test, predSigmoidY))
 
-linearClassifier = SVC(kernel='linear')
-linearClassifier.fit(X_train, y_train)
-predLinearY = linearClassifier.predict(X_test)
+dataset = pd.read_csv("../data/banana.csv")
+X_train, X_test, y_train, y_test = setupDataset(dataset)
 
-print(confusion_matrix(y_test, predSigmoidY))
+predSigmoidY = applyKernel('sigmoid', X_train, X_test, y_train)
+predLinearY = applyKernel('linear', X_train, X_test, y_train)
+predPolyY = applyKernel('poly', X_train, X_test, y_train)
+predRBFY = applyKernel('rbf', X_train, X_test, y_train)
+
+print(confusion_matrix(y_test, predLinearY))
 print(classification_report(y_test, predLinearY))
-
-polyClassifier = SVC(kernel='poly', degree=8)
-polyClassifier.fit(X_train, y_train)
-predPolyY = polyClassifier.predict(X_test)
-
-print(confusion_matrix(y_test, predPolyY))
-print(classification_report(y_test, predPolyY))
-
-RBFClassifier = SVC(kernel='rbf')
-RBFClassifier.fit(X_train, y_train)
-predRBFY = RBFClassifier.predict(X_test)
-
-print(confusion_matrix(y_test, predRBFY))
-print(classification_report(y_test, predRBFY))
