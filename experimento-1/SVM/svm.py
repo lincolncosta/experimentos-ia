@@ -68,8 +68,7 @@ def generateGraphs(X, y, classifiers, h=0.2):
                          np.arange(y_min, y_max, h))
 
     for i, classifier in classifiers:
-        plt.subplot(3, 3, i + 1)
-        plt.subplots_adjust(wspace=0.6, hspace=0.6)
+        plt.clf()
 
         Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()])
 
@@ -84,7 +83,8 @@ def generateGraphs(X, y, classifiers, h=0.2):
         plt.xticks(())
         plt.yticks(())
         plt.title(titles[i])
-    plt.savefig('kernel-types.png')
+        plt.savefig('{}.png'.format(titles[i]))
+    # plt.savefig('kernel-types.png')
 
 
 dataset = pd.read_csv("../data/banana.csv")
