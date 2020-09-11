@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import csv
+import seaborn as sns
 
 titles = ['Sigmoid coef 1',
           'Sigmoid coef 0.5',
@@ -14,16 +15,28 @@ titles = ['Sigmoid coef 1',
           'Sigmoid RBF']
 
 
+def generateScatter(dataset):
+    color_dict = dict({1.0: 'red',
+                       -1.0: 'dodgerblue'})
+    scatter = sns.scatterplot(x="at1", y="at2", hue="Label",
+                              data=dataset, palette=color_dict)
+    scatter.set(xlabel='Attribute 1', ylabel='Attribute 2')
+    plt.savefig('initial-scatter.png')
+
+
 def setupDataset(dataset):
-    X = dataset.drop('classe', axis=1)
-    y = dataset['classe']
+    X = dataset.drop('Label', axis=1)
+    y = dataset['Label']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
     return X, y, X_train, X_test, y_train, y_test
 
 
 def applyKernel(kernelType, X_train, X_test, y_train, coef0=0.0):
-    classifier = SVC(kernel=kernelType, coef0=coef0)
+    if(kernelType == 'linear'):
+        classifier = LinearSVC(C=1.0)
+    else:
+        classifier = SVC(kernel=kernelType, coef0=coef0)
     classifier.fit(X_train, y_train)
     predY = classifier.predict(X_test)
     return classifier, predY
@@ -75,6 +88,7 @@ def generateGraphs(X, y, classifiers, h=0.2):
 
 
 dataset = pd.read_csv("../data/banana.csv")
+generateScatter(dataset)
 X, y, X_train, X_test, y_train, y_test = setupDataset(dataset)
 
 classifierSigmoid1, predSigmoidY1 = applyKernel(
@@ -98,5 +112,5 @@ evaluateKernel(y_test, predPolyY, 'poly', classifierPoly)
 classifierRBF, predRBFY = applyKernel('rbf', X_train, X_test, y_train)
 evaluateKernel(y_test, predRBFY, 'RBF', classifierRBF)
 
-plt = generateGraphs(X.to_numpy(), y.to_numpy(dtype=np.int64), enumerate((classifierSigmoid1,
-                                                                          classifierSigmoid05, classifierSigmoid001, classifierLinear, classifierPoly, classifierRBF)))
+generateGraphs(X.to_numpy(), y.to_numpy(dtype=np.int64), enumerate((classifierSigmoid1,
+                                                                    classifierSigmoid05, classifierSigmoid001, classifierLinear, classifierPoly, classifierRBF)))
