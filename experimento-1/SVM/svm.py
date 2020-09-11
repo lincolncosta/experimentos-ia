@@ -13,15 +13,6 @@ titles = ['Sigmoid coef 1',
           'Sigmoid RBF']
 
 
-def generateScatter(dataset):
-    color_dict = dict({1.0: 'red',
-                       -1.0: 'dodgerblue'})
-    scatter = sns.scatterplot(x="at1", y="at2", hue="classe",
-                              data=dataset, palette=color_dict)
-    scatter.set(xlabel='Atributo 1', ylabel='Atributo 2')
-    return plt.show()
-
-
 def setupDataset(dataset):
     X = dataset.drop('classe', axis=1)
     y = dataset['classe']
