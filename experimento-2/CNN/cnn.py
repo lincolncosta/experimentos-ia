@@ -6,6 +6,13 @@ from keras.layers import Conv2D, MaxPool2D
 from keras.optimizers import SGD
 from keras.callbacks import CSVLogger
 from keras.models import load_model
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def main():
+    runCNN()
+    generateGraphs()
 
 
 def runCNN():
@@ -60,7 +67,7 @@ def runCNN():
                       metrics=["accuracy"])
 
         csv_logger = CSVLogger(
-            'log-{}.csv'.format(epochAmount), append=True, separator=';')
+            'log-{}.csv'.format(epochAmount), append=True, separator=',')
 
         model.fit(x=x_train,
                   y=y_train,
@@ -70,9 +77,63 @@ def runCNN():
                   validation_data=(x_test, y_test),
                   callbacks=[csv_logger])
 
-        model.evaluate(x_test, y_test, callbacks=[csv_logger])
+        model.evaluate(x_test, y_test)
 
         model.save("cnn_model-{}.h5".format(epochAmount))
 
 
-runCNN()
+def generateGraphs():
+    generateAccuracyGraphs()
+    generateLossGraphs()
+
+
+def generateAccuracyGraphs():
+    for epochAmount in range(1, 6):
+        dataset = pd.read_csv("log-{}.csv".format(epochAmount))
+        # Epoch
+        epoch = dataset['epoch'].values
+
+        # Train data
+        accuracyTrain = dataset['accuracy']
+        # Test data
+        accuracyTest = dataset['val_accuracy']
+
+        plt.clf()
+
+        # Plotting train and test accuracy
+        plt.plot(epoch, accuracyTrain, label="Train accuracy", marker='o')
+        plt.plot(epoch, accuracyTest, label="Test accuracy", marker='o')
+
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+
+        plt.legend()
+        plt.savefig('accuracy-{}.png'.format(epochAmount))
+
+
+def generateLossGraphs():
+    for epochAmount in range(1, 6):
+        dataset = pd.read_csv("log-{}.csv".format(epochAmount))
+
+        # Epoch
+        epoch = dataset['epoch'].values
+
+        # Train data
+        lossTrain = dataset['loss']
+        # Test data
+        lossTest = dataset['val_loss']
+
+        plt.clf()
+
+        # Plotting train and test loss
+        plt.plot(epoch, lossTrain, label="Train loss", marker='o')
+        plt.plot(epoch, lossTest, label="Test loss", marker='o')
+
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+
+        plt.legend()
+        plt.savefig('loss-{}.png'.format(epochAmount))
+
+
+main()
