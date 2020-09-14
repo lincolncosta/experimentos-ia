@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.svm import SVC, LinearSVC
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
@@ -15,6 +15,41 @@ titles = ['Sigmoid coef 1',
           'Sigmoid RBF']
 
 
+def main():
+    dataset, X, y, X_train, X_test, y_train, y_test = setupDataset()
+
+    generateScatter(dataset)
+
+    # Kernels application
+    classifierSigmoid1, predSigmoidY1 = applyKernel(
+        'sigmoid', X_train, X_test, y_train, 1)
+    evaluateKernel(X, y, y_test, predSigmoidY1, 'sigmoid1', classifierSigmoid1)
+
+    classifierSigmoid05, predSigmoidY05 = applyKernel(
+        'sigmoid', X_train, X_test, y_train, 0.5)
+    evaluateKernel(X, y, y_test, predSigmoidY05,
+                   'sigmoid05', classifierSigmoid05)
+
+    classifierSigmoid001, predSigmoidY001 = applyKernel(
+        'sigmoid', X_train, X_test, y_train, 0.01)
+    evaluateKernel(X, y, y_test, predSigmoidY001,
+                   'sigmoid001', classifierSigmoid001)
+
+    classifierLinear, predLinearY = applyKernel(
+        'linear', X_train, X_test, y_train)
+    evaluateKernel(X, y, y_test, predLinearY, 'linear', classifierLinear)
+
+    classifierPoly, predPolyY = applyKernel('poly', X_train, X_test, y_train)
+    evaluateKernel(X, y, y_test, predPolyY, 'poly', classifierPoly)
+
+    classifierRBF, predRBFY = applyKernel('rbf', X_train, X_test, y_train)
+    evaluateKernel(X, y, y_test, predRBFY, 'RBF', classifierRBF)
+
+    # Generate evaluation graphs
+    generateGraphs(X.to_numpy(), y.to_numpy(dtype=np.int64), enumerate((classifierSigmoid1,
+                                                                        classifierSigmoid05, classifierSigmoid001, classifierLinear, classifierPoly, classifierRBF)))
+
+
 def generateScatter(dataset):
     color_dict = dict({1.0: 'red',
                        -1.0: 'dodgerblue'})
@@ -24,12 +59,13 @@ def generateScatter(dataset):
     plt.savefig('initial-scatter.png')
 
 
-def setupDataset(dataset):
+def setupDataset():
+    dataset = pd.read_csv("../data/banana.csv")
     X = dataset.drop('Label', axis=1)
     y = dataset['Label']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
-    return X, y, X_train, X_test, y_train, y_test
+    return dataset, X, y, X_train, X_test, y_train, y_test
 
 
 def applyKernel(kernelType, X_train, X_test, y_train, coef0=0.0):
@@ -42,7 +78,7 @@ def applyKernel(kernelType, X_train, X_test, y_train, coef0=0.0):
     return classifier, predY
 
 
-def evaluateKernel(y_test, y_pred, kernelType, classifier):
+def evaluateKernel(X, y, y_test, y_pred, kernelType, classifier):
     confusionMatrix = pd.crosstab(y_test, y_pred)
     classificationReport = classification_report(
         y_test, y_pred, output_dict=True)
@@ -50,9 +86,12 @@ def evaluateKernel(y_test, y_pred, kernelType, classifier):
     pd.DataFrame(classificationReport).transpose().to_csv(
         'classification-report-{}.csv'.format(kernelType))
 
-    scoresCV2 = cross_val_score(classifier, X, y, cv=2)
-    scoresCV5 = cross_val_score(classifier, X, y, cv=5)
-    scoresCV10 = cross_val_score(classifier, X, y, cv=10)
+    kfold2 = KFold(n_splits=2)
+    scoresCV2 = cross_val_score(classifier, X, y, cv=kfold2)
+    kfold5 = KFold(n_splits=5)
+    scoresCV5 = cross_val_score(classifier, X, y, cv=kfold5)
+    kfold10 = KFold(n_splits=10)
+    scoresCV10 = cross_val_score(classifier, X, y, cv=kfold10)
 
     with open('cross-validation-file.csv', mode='a') as CVFile:
         writer = csv.writer(CVFile)
@@ -87,30 +126,4 @@ def generateGraphs(X, y, classifiers, h=0.2):
     # plt.savefig('kernel-types.png')
 
 
-dataset = pd.read_csv("../data/banana.csv")
-generateScatter(dataset)
-X, y, X_train, X_test, y_train, y_test = setupDataset(dataset)
-
-classifierSigmoid1, predSigmoidY1 = applyKernel(
-    'sigmoid', X_train, X_test, y_train, 1)
-evaluateKernel(y_test, predSigmoidY1, 'sigmoid1', classifierSigmoid1)
-
-classifierSigmoid05, predSigmoidY05 = applyKernel(
-    'sigmoid', X_train, X_test, y_train, 0.5)
-evaluateKernel(y_test, predSigmoidY05, 'sigmoid05', classifierSigmoid05)
-
-classifierSigmoid001, predSigmoidY001 = applyKernel(
-    'sigmoid', X_train, X_test, y_train, 0.01)
-evaluateKernel(y_test, predSigmoidY001, 'sigmoid001', classifierSigmoid001)
-
-classifierLinear, predLinearY = applyKernel('linear', X_train, X_test, y_train)
-evaluateKernel(y_test, predLinearY, 'linear', classifierLinear)
-
-classifierPoly, predPolyY = applyKernel('poly', X_train, X_test, y_train)
-evaluateKernel(y_test, predPolyY, 'poly', classifierPoly)
-
-classifierRBF, predRBFY = applyKernel('rbf', X_train, X_test, y_train)
-evaluateKernel(y_test, predRBFY, 'RBF', classifierRBF)
-
-generateGraphs(X.to_numpy(), y.to_numpy(dtype=np.int64), enumerate((classifierSigmoid1,
-                                                                    classifierSigmoid05, classifierSigmoid001, classifierLinear, classifierPoly, classifierRBF)))
+main()
