@@ -104,8 +104,8 @@ def generateAccuracyGraphs():
         plt.plot(epoch, accuracyTrain, label="Train accuracy", marker='o')
         plt.plot(epoch, accuracyTest, label="Test accuracy", marker='o')
 
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
+        plt.xlabel('Época')
+        plt.ylabel('Acurácia')
 
         plt.legend()
         plt.savefig('accuracy-{}.png'.format(epochAmount))
@@ -129,8 +129,8 @@ def generateLossGraphs():
         plt.plot(epoch, lossTrain, label="Train loss", marker='o')
         plt.plot(epoch, lossTest, label="Test loss", marker='o')
 
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
+        plt.xlabel('Época')
+        plt.ylabel('Erro')
 
         plt.legend()
         plt.savefig('loss-{}.png'.format(epochAmount))

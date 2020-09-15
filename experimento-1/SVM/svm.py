@@ -53,16 +53,16 @@ def main():
 def generateScatter(dataset):
     color_dict = dict({1.0: 'red',
                        -1.0: 'dodgerblue'})
-    scatter = sns.scatterplot(x="at1", y="at2", hue="Label",
+    scatter = sns.scatterplot(x="at1", y="at2", hue="Classe",
                               data=dataset, palette=color_dict)
-    scatter.set(xlabel='Attribute 1', ylabel='Attribute 2')
+    scatter.set(xlabel='Atributo 1', ylabel='Atributo 2')
     plt.savefig('initial-scatter.png')
 
 
 def setupDataset():
     dataset = pd.read_csv("../data/banana.csv")
-    X = dataset.drop('Label', axis=1)
-    y = dataset['Label']
+    X = dataset.drop('Classe', axis=1)
+    y = dataset['Classe']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
     return dataset, X, y, X_train, X_test, y_train, y_test
