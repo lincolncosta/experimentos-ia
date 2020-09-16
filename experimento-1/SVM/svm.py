@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.svm import SVC, LinearSVC
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, mean_absolute_error
 import matplotlib.pyplot as plt
 import csv
 import seaborn as sns
@@ -23,27 +23,29 @@ def main():
     # Kernels application
     classifierSigmoid1, predSigmoidY1 = applyKernel(
         'sigmoid', X_train, X_test, y_train, 1)
-    evaluateKernel(X, y, y_test, predSigmoidY1, 'sigmoid1', classifierSigmoid1)
+    evaluateKernel(X, y, X_test, y_test, predSigmoidY1,
+                   'sigmoid1', classifierSigmoid1)
 
     classifierSigmoid05, predSigmoidY05 = applyKernel(
         'sigmoid', X_train, X_test, y_train, 0.5)
-    evaluateKernel(X, y, y_test, predSigmoidY05,
+    evaluateKernel(X, y, X_test, y_test, predSigmoidY05,
                    'sigmoid05', classifierSigmoid05)
 
     classifierSigmoid001, predSigmoidY001 = applyKernel(
         'sigmoid', X_train, X_test, y_train, 0.01)
-    evaluateKernel(X, y, y_test, predSigmoidY001,
+    evaluateKernel(X, y, X_test, y_test, predSigmoidY001,
                    'sigmoid001', classifierSigmoid001)
 
     classifierLinear, predLinearY = applyKernel(
         'linear', X_train, X_test, y_train)
-    evaluateKernel(X, y, y_test, predLinearY, 'linear', classifierLinear)
+    evaluateKernel(X, y, X_test, y_test, predLinearY,
+                   'linear', classifierLinear)
 
     classifierPoly, predPolyY = applyKernel('poly', X_train, X_test, y_train)
-    evaluateKernel(X, y, y_test, predPolyY, 'poly', classifierPoly)
+    evaluateKernel(X, y, X_test, y_test, predPolyY, 'poly', classifierPoly)
 
     classifierRBF, predRBFY = applyKernel('rbf', X_train, X_test, y_train)
-    evaluateKernel(X, y, y_test, predRBFY, 'RBF', classifierRBF)
+    evaluateKernel(X, y, X_test, y_test, predRBFY, 'RBF', classifierRBF)
 
     # Generate evaluation graphs
     generateGraphs(X.to_numpy(), y.to_numpy(dtype=np.int64), enumerate((classifierSigmoid1,
@@ -78,7 +80,7 @@ def applyKernel(kernelType, X_train, X_test, y_train, coef0=0.0):
     return classifier, predY
 
 
-def evaluateKernel(X, y, y_test, y_pred, kernelType, classifier):
+def evaluateKernel(X, y, X_test, y_test, y_pred, kernelType, classifier):
     confusionMatrix = pd.crosstab(y_test, y_pred)
     classificationReport = classification_report(
         y_test, y_pred, output_dict=True)
@@ -95,9 +97,12 @@ def evaluateKernel(X, y, y_test, y_pred, kernelType, classifier):
 
     with open('cross-validation-file.csv', mode='a') as CVFile:
         writer = csv.writer(CVFile)
-        writer.writerow([kernelType, 2, scoresCV2, scoresCV2.mean()])
-        writer.writerow([kernelType, 5, scoresCV5, scoresCV5.mean()])
-        writer.writerow([kernelType, 10, scoresCV10, scoresCV10.mean()])
+        writer.writerow([kernelType, 2, scoresCV2,
+                         scoresCV2.mean(), 1 - scoresCV2.mean()])
+        writer.writerow([kernelType, 5, scoresCV5,
+                         scoresCV5.mean(), 1 - scoresCV5.mean()])
+        writer.writerow([kernelType, 10, scoresCV10,
+                         scoresCV10.mean(), 1 - scoresCV10.mean()])
 
 
 def generateGraphs(X, y, classifiers, h=0.2):
