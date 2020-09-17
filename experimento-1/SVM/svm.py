@@ -4,15 +4,16 @@ from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.svm import SVC, LinearSVC
 from sklearn.metrics import classification_report, confusion_matrix, mean_absolute_error
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import csv
 import seaborn as sns
 
-titles = ['Sigmoid coef 1',
-          'Sigmoid coef 0.5',
-          'Sigmoid coef 0.01',
-          'Sigmoid Linear',
-          'Sigmoid Poly',
-          'Sigmoid RBF']
+titles = ['Sigmoid coef0 1',
+          'Sigmoid coef0 0.5',
+          'Sigmoid coef0 0.01',
+          'Linear',
+          'Poly',
+          'RBF']
 
 
 def main():
@@ -49,7 +50,7 @@ def main():
 
     # Generate evaluation graphs
     generateGraphs(X.to_numpy(), y.to_numpy(dtype=np.int64), enumerate((classifierSigmoid1,
-                                                                        classifierSigmoid05, classifierSigmoid001, classifierLinear, classifierPoly, classifierRBF)))
+                                                                        classifierSigmoid05, classifierSigmoid001, classifierLinear, classifierPoly, classifierRBF)), dataset)
 
 
 def generateScatter(dataset):
@@ -105,7 +106,7 @@ def evaluateKernel(X, y, X_test, y_test, y_pred, kernelType, classifier):
                          scoresCV10.mean(), 1 - scoresCV10.mean()])
 
 
-def generateGraphs(X, y, classifiers, h=0.2):
+def generateGraphs(X, y, classifiers, dataset, h=0.2):
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
@@ -121,14 +122,16 @@ def generateGraphs(X, y, classifiers, h=0.2):
         plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)
 
         # Plot also the training points
-        plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.coolwarm)
+        color_dict = dict({1.0: 'red',
+                           -1.0: 'dodgerblue'})
+        scatter = sns.scatterplot(x="at1", y="at2", hue="Classe",
+                                  data=dataset, palette=color_dict)
+        scatter.set(xlabel='⠀⠀⠀⠀⠀⠀⠀⠀⠀', ylabel='⠀⠀⠀⠀⠀⠀⠀⠀⠀')
         plt.xlim(xx.min(), xx.max())
         plt.ylim(yy.min(), yy.max())
         plt.xticks(())
         plt.yticks(())
-        plt.title(titles[i])
         plt.savefig('{}.png'.format(titles[i]))
-    # plt.savefig('kernel-types.png')
 
 
 main()
