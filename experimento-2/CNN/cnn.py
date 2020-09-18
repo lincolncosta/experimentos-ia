@@ -11,17 +11,18 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    runCNN()
+    # runCNN()
     generateGraphs()
 
 
 def runCNN():
-    for epochAmount in range(1, 6):
+    for epochAmount in range(1, 16):
         (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
         # input image rwo and column
         input_img_row = x_train[0].shape[0]
         input_img_cols = x_train[0].shape[1]
+
 
         # reshape the input image to one dimension
         x_train = x_train.reshape(
@@ -88,7 +89,7 @@ def generateGraphs():
 
 
 def generateAccuracyGraphs():
-    for epochAmount in range(1, 6):
+    for epochAmount in range(1, 16):
         dataset = pd.read_csv("log-{}.csv".format(epochAmount))
         # Epoch
         epoch = dataset['epoch'].values
@@ -101,8 +102,8 @@ def generateAccuracyGraphs():
         plt.clf()
 
         # Plotting train and test accuracy
-        plt.plot(epoch, accuracyTrain, label="Train accuracy", marker='o')
-        plt.plot(epoch, accuracyTest, label="Test accuracy", marker='o')
+        plt.plot(epoch, accuracyTrain, label="Acurácia em treino", marker='o')
+        plt.plot(epoch, accuracyTest, label="Acurácia em teste", marker='o')
 
         plt.xlabel('Época')
         plt.ylabel('Acurácia')
@@ -112,7 +113,7 @@ def generateAccuracyGraphs():
 
 
 def generateLossGraphs():
-    for epochAmount in range(1, 6):
+    for epochAmount in range(1, 16):
         dataset = pd.read_csv("log-{}.csv".format(epochAmount))
 
         # Epoch
@@ -126,8 +127,8 @@ def generateLossGraphs():
         plt.clf()
 
         # Plotting train and test loss
-        plt.plot(epoch, lossTrain, label="Train loss", marker='o')
-        plt.plot(epoch, lossTest, label="Test loss", marker='o')
+        plt.plot(epoch, lossTrain, label="Erro em treino", marker='o')
+        plt.plot(epoch, lossTest, label="Erro em teste", marker='o')
 
         plt.xlabel('Época')
         plt.ylabel('Erro')
