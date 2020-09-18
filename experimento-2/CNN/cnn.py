@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    # runCNN()
+    runCNN()
     generateGraphs()
 
 

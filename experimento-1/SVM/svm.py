@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.svm import SVC, LinearSVC
-from sklearn.metrics import classification_report, confusion_matrix, mean_absolute_error
+from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import csv
@@ -126,7 +126,7 @@ def generateGraphs(X, y, classifiers, dataset, h=0.2):
                            -1.0: 'dodgerblue'})
         scatter = sns.scatterplot(x="at1", y="at2", hue="Classe",
                                   data=dataset, palette=color_dict)
-        scatter.set(xlabel='⠀⠀⠀⠀⠀⠀⠀⠀⠀', ylabel='⠀⠀⠀⠀⠀⠀⠀⠀⠀')
+        scatter.set(xlabel=None, ylabel=None)
         plt.xlim(xx.min(), xx.max())
         plt.ylim(yy.min(), yy.max())
         plt.xticks(())
